@@ -3,7 +3,7 @@ var utils = require('./utils')
 var config = require('../config')
 var vueLoaderConfig = require('./vue-loader.conf')
 
-function resolve (dir) {
+function resolve(dir) {
   return path.join(__dirname, '..', dir)
 }
 
@@ -36,6 +36,10 @@ module.exports = {
         test: /\.js$/,
         loader: 'babel-loader',
         include: [resolve('src'), resolve('test')]
+      },
+      {
+        test: /\.scss$/,
+        loader: 'style!css!sass'
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
