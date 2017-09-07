@@ -1,13 +1,135 @@
 <template>
-  <div class="login-container">
-    
+  <div class="login-container" :style="{backgroundImage:'url('+ bg +')'}">
+    <img class="logo" src='../../assets/login/logo.png'>
+    <el-form id="form" :model="loginForm" autoComplete="off" :rules="loginRules" ref="loginForm" label-position="left" label-width="0px" class="card-box login-form">
+      <div class="title">
+        <span style="font-weight:bold;">LOGIN</span>
+        <span> SYSTEM</span>
+      </div>
+      <el-form-item prop="acount" class="item">
+        <div class="icon-container">
+          <img class="icon1" src="../../assets/login/user_icon.png">
+        </div>
+        <input type="text" name="acount" autoComplete="off" placeholder="请输入用户名" v-model="loginForm.acount">
+      </el-form-item>
+      <el-form-item prop="password" class="item">
+        <div class="icon-container">
+          <img class="icon1" src="../../assets/login/password_icon.png">
+        </div>
+        <input type="password" name="password" autoComplete="off" placeholder="请输入密码" v-model="loginForm.password">
+      </el-form-item>
+      <el-form-item class="item item1">
+        <el-button class="login-button" :loading="loading" @click.native.prevent="handleLogin">
+          登录
+        </el-button>
+      </el-form-item>
+    </el-form>
+    <div class="dcode-container">
+      <div class="dcode">
+        <div>
+          <img src="../../assets/login/weixin_erweima.png" class="img1">
+        </div>
+        <div>
+          <img src="../../assets/login/weixinlogo.png" class="img2">
+          <p class="dcode-text">汉王蓝天</p>
+        </div>
+      </div>
+      <div class="dcode">
+        <div>
+          <img src="../../assets/login/weibo_erweima.png" class="img1">
+        </div>
+        <div>
+          <img src="../../assets/login/weibologo.png" class="img2">
+          <p class="dcode-text">汉王蓝天</p>
+        </div>
+      </div>
+    </div>
+    <div class="copyright">
+      Copyright &nbsp;&copy;&nbsp; 汉王蓝天科技有限公司
+    </div>
   </div>
 </template>
  
 <script>
-export default {
+// import $ from 'jquery'
+import bgPic from '../../assets/login/bj.jpg'
+import { isChinese } from '@/utils/validate'
+import { login } from '@/api/login'
+import { getCookie, setCookie, removeCookie } from '@/utils/cookie'
 
-};
+export default {
+  data() {
+    var validateAcount = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('用户名不能为空'))
+      } else {
+        callback()
+      }
+    };
+    var validatePass = (rule, value, callback) => {
+      if (value.length < 6) {
+        callback(new Error('密码不能小于6位'));
+      } else {
+        callback();
+      }
+    };
+    return {
+      bg: bgPic,
+      loginForm: {
+        acount: '13521347060',
+        password: '123456'
+      },
+      loginRules: {
+        acount: [
+          {
+            required: true,
+            trigger: 'blur',
+            validator: validateAcount
+          }
+        ],
+        password: [
+          {
+            required: true,
+            trigger: 'blur',
+            validator: validatePass
+          }
+        ]
+      },
+      loading: false
+    }
+  },
+  methods: {
+    handleLogin() {
+      this.$refs.loginForm.validate(valid => {
+        if (valid) {
+          if (isChinese(this.loginForm.acount)) {
+            this.loginForm.acount = unescape(encodeURIComponent(this.loginForm.acount))
+          }
+          this.loading = true
+          var username = this.loginForm.acount.trim();
+          var password = this.loginForm.password.trim();
+         // var auth = "Basic " + btoa(username + ":" + md5(password));
+
+          return new Promise((resolve, reject) => {
+            login(username, password).then(response => {
+              console.log(response)
+              //const data = response.data
+              // window.sessionStorage.setItem('userInfo',JSON.stringify(data))
+              if (response.data.roles.length !== 0 && response.data.roles[0] == 'ROLE_USER') {
+                setCookie('userToken', 'user')
+              }
+              this.$router.push({ path: '/homepage' })
+              resolve()
+            }).catch(error => {
+              reject(error)
+              this.loading = false
+            })
+          })
+        }
+      })
+    }
+  }
+}
 </script>
 <style rel="stylesheet/scss" lang="scss" scoped>
 * {
@@ -17,8 +139,7 @@ export default {
 
 .login-container {
   width: 100%;
-  height: 100vh;
-  //background-image: url(../../assets/login/bj.jpg);
+  height: 100vh; //background-image: url(../../assets/login/bj.jpg);
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -123,7 +244,7 @@ export default {
   }
 }
 
-@media screen and (min-width:992px) and (max-width:2048px) {
+@media screen and (min-width:992px) and (max-width:1920px) {
   .logo {
     width: 20%;
     margin-top: 50px;
@@ -145,7 +266,7 @@ export default {
     font-family: Helvetica;
     font-size: 48px;
     color: #fff;
-    margin: 20px auto 20px auto;
+    margin: 10px auto 10px auto;
     text-align: center;
     font-weight: 200;
   }
@@ -175,7 +296,7 @@ export default {
   }
   input {
     width: 300px;
-    height: 150px;
+    height: 100px;
     margin-left: 40px;
     background-color: rgba(12, 26, 44, 0);
     border-color: white;

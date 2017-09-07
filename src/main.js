@@ -3,147 +3,65 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import 'element-ui/lib/theme-default/index.css'
+import 'normalize.css'
+import NProgress from 'nprogress'
+import { getCookie } from '@/utils/cookie'
+import '@/assets/iconfont'
+import IconSvg from '@/components/Icon-svg/Icon-svg.vue'
 import {
-//   Pagination,
-//   Dialog,
   Autocomplete,
-//   Dropdown,
-//   DropdownMenu,
-//   DropdownItem,
-//   Menu,
-//   Submenu,
-//   MenuItem,
-//   MenuItemGroup,
-//   Input,
-//   InputNumber,
-//   Radio,
-//   RadioGroup,
-//   RadioButton,
-//   Checkbox,
-//   CheckboxGroup,
-//   Switch,
-//   Select,
-//   Option,
-//   OptionGroup,
+  Input,
+  Radio,
+  RadioGroup,
+  Select,
+  Option,
   Button,
-//   ButtonGroup,
-//   Table,
-//   TableColumn,
-//   DatePicker,
-//   TimeSelect,
-//   TimePicker,
-//   Popover,
-//   Tooltip,
-//   Breadcrumb,
-//   BreadcrumbItem,
   Form,
   FormItem,
-//   Tabs,
-//   TabPane,
-//   Tag,
-//   Tree,
-//   Alert,
-//   Slider,
-//   Icon,
-//   Row,
-//   Col,
-//   Upload,
-//   Progress,
-//   Spinner,
-//   Badge,
-//   Card,
-//   Rate,
-//   Steps,
-//   Step,
-//   Carousel,
-//   Scrollbar,
-//   CarouselItem,
-//   Collapse,
-//   CollapseItem,
-//   Cascader,
-//   ColorPicker,
-//   Loading,
-//   MessageBox,
-//   Message,
-//   Notification
+  Tabs,
+  TabPane,
+  Slider,
+  Message,
 } from 'element-ui'
 
-// Vue.use(Pagination)
-// Vue.use(Dialog)
+
 Vue.use(Autocomplete)
-// Vue.use(Dropdown)
-// Vue.use(DropdownMenu)
-// Vue.use(DropdownItem)
-// Vue.use(Menu)
-// Vue.use(Submenu)
-// Vue.use(MenuItem)
-// Vue.use(MenuItemGroup)
-// Vue.use(Input)
-// Vue.use(InputNumber)
-// Vue.use(Radio)
-// Vue.use(RadioGroup)
-// Vue.use(RadioButton)
-// Vue.use(Checkbox)
-// Vue.use(CheckboxGroup)
-// Vue.use(Switch)
-// Vue.use(Select)
-// Vue.use(Option)
-// Vue.use(OptionGroup)
-// Vue.use(Button)
-// Vue.use(ButtonGroup)
-// Vue.use(Table)
-// Vue.use(TableColumn)
-// Vue.use(DatePicker)
-// Vue.use(TimeSelect)
-// Vue.use(TimePicker)
-// Vue.use(Popover)
-// Vue.use(Tooltip)
-// Vue.use(Breadcrumb)
-// Vue.use(BreadcrumbItem)
-// Vue.use(Form)
-// Vue.use(FormItem)
-// Vue.use(Tabs)
-// Vue.use(TabPane)
-// Vue.use(Tag)
-// Vue.use(Tree)
-// Vue.use(Alert)
-// Vue.use(Slider)
-// Vue.use(Icon)
-// Vue.use(Row)
-// Vue.use(Col)
-// Vue.use(Upload)
-// Vue.use(Progress)
-// Vue.use(Spinner)
-// Vue.use(Badge)
-// Vue.use(Card)
-// Vue.use(Rate)
-// Vue.use(Steps)
-// Vue.use(Step)
-// Vue.use(Carousel)
-// Vue.use(Scrollbar)
-// Vue.use(CarouselItem)
-// Vue.use(Collapse)
-// Vue.use(CollapseItem)
-// Vue.use(Cascader)
-// Vue.use(ColorPicker)
+Vue.use(Input)
+Vue.use(Radio)
+Vue.use(RadioGroup)
+Vue.use(Select)
+Vue.use(Option)
+Vue.use(Button)
+Vue.use(Form)
+Vue.use(FormItem)
+Vue.use(Tabs)
+Vue.use(TabPane)
+Vue.use(Slider)
+Vue.prototype.$message = Message
 
-// Vue.use(Loading.directive)
 
-// Vue.prototype.$loading = Loading.service
-// Vue.prototype.$msgbox = MessageBox
-// Vue.prototype.$alert = MessageBox.alert
-// Vue.prototype.$confirm = MessageBox.confirm
-// Vue.prototype.$prompt = MessageBox.prompt
-// Vue.prototype.$notify = Notification
-// Vue.prototype.$message = Message
-
-// import { Button, Autocomplete, Form, FormItem } from 'element-ui'
-// Vue.use(Button)
-// Vue.use(Autocomplete)
-// Vue.use(Form)
-// Vue.use(FormItem)
-
+Vue.component('icon-svg', IconSvg)
 Vue.config.productionTip = false
+
+const whiteList = ['/login'];// 不重定向白名单
+router.beforeEach((to, from, next) => {
+  NProgress.start(); // 开启Progress
+  if (getCookie('userToken')) { // 判断是否有token
+    if (to.path === '/login') {
+      next({ path: '/' });
+    } else {
+      next();
+    }
+  } else {
+    if (whiteList.indexOf(to.path) !== -1) { // 在免登录白名单，直接进入
+      next()
+    } else {
+      next('/login'); // 否则全部重定向到登录页
+      NProgress.done(); // 在hash模式下 改变手动改变hash 重定向回来 不会触发afterEach 暂时hack方案 ps：history模式下无问题，可删除该行！
+    }
+  }
+});
 
 /* eslint-disable no-new */
 new Vue({
