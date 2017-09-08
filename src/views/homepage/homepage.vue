@@ -1,7 +1,7 @@
 <template>
   <div class="data-container">
 
-    <div class="title">
+    <div class="main_title">
       <span class="text">汉王蓝天大屏页面配置</span>
       <el-button type="warning" style="margin-right:20px;" @click="logout">退出</el-button>
       <el-button type="success" style="margin-right:80px;" @click="save">保存</el-button>
@@ -12,27 +12,165 @@
       <div class="left">
         <el-tabs v-model="activeName" type="border-card" @tab-remove="removeTab">
           <el-tab-pane label="页面模板" name="first">
-            <p class="modelItem">
-              <icon-svg icon-class="bianji" class="icon1" @click="addTab('modela')"></icon-svg>
-              modela
-              <icon-svg icon-class="shanchu" class="icon2"></icon-svg>
+            <p class="modelItem" v-for="item in configList">
+              <span @click.stop="addTab(item)" class="icon1">
+                <icon-svg icon-class="bianji"></icon-svg>
+              </span>
+              {{item}}
+              <span @click.stop="deleteConfig(item)" class="icon2">
+                <icon-svg icon-class="shanchu"></icon-svg>
+              </span>
             </p>
-            <!-- <el-button @click="addTab('modela')">modela</el-button>
-            <el-button @click="addTab('modelb')">modelb</el-button>
-            <el-button @click="addTab('modelc')">modelc</el-button>
-            <el-button @click="addTab('modeld')">modeld</el-button>
-            <el-button @click="addTab('hotel')">hotel</el-button>
-            <el-button @click="addTab('工厂')">工厂</el-button>
-            <el-button @click="addTab('学校')">学校</el-button> -->
           </el-tab-pane>
           <el-tab-pane v-if="model.name" :label="model.name" :name="model.name" closable>
             {{model.content}}
           </el-tab-pane>
         </el-tabs>
+        <el-button type="success" @click="dialogVisible = true">新建配置</el-button>
       </div>
-      <div class="center"></div>
-      <div class="right"></div>
+
+      <div class="center">
+        <el-row class="center_top">
+          <el-col :lg="16" :md="16" class="element_buttons">
+            <el-button @click="addElement('pic')">
+              <icon-svg icon-class="tupian1"></icon-svg>
+              图片
+            </el-button>
+            <el-button @click="addElement('text')">
+              <icon-svg icon-class="wenben"></icon-svg>
+              文本
+            </el-button>
+            <el-button @click="addElement('device')">
+              <icon-svg icon-class="shebei"></icon-svg>
+              设备数据
+            </el-button>
+            <el-button @click="addElement('weather')">
+              <icon-svg icon-class="tianqi"></icon-svg>
+              室外天气
+            </el-button>
+            <el-button @click="addElement('time')">
+              <icon-svg icon-class="shijian"></icon-svg>
+              北京时间
+            </el-button>
+          </el-col>
+          <el-col :lg="8" :md="8" class="operate_buttons">
+            <el-button-group style="float:right;">
+              <el-button>上一层</el-button>
+              <el-button>下一层</el-button>
+              <el-button>删除</el-button>
+            </el-button-group>
+          </el-col>
+        </el-row>
+
+        <div class="preview_box"></div>
+      </div>
+
+      <div class="right">
+        <div class="pic_editor editor" v-if="editor=='pic'">
+          <p class="editor_title">图片</p>
+          <div class="box box1">
+            <a href="javascript:;" class="a-upload">
+              <input type="file" name="" id="uploadImage">更换图片
+            </a>
+            <img src="../../assets/editor/img4.jpg">
+          </div>
+          <div class="box box2">
+            <p class="box_title">样式</p>
+            <div class="item">
+              <p class="name">圆角</p>
+              <div class="item_right">
+                <el-slider v-model="pic_ele.radius" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">透明度</p>
+              <div class="item_right">
+                <el-slider v-model="pic_ele.opacity" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+          </div>
+          <div class="box box3">
+            <p class="box_title">位置</p>
+            <div class="item">
+              <p class="name">X轴</p>
+              <div class="item_right">
+                <el-slider v-model="pic_ele.x" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">Y轴</p>
+              <div class="item_right">
+                <el-slider v-model="pic_ele.y" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">层级</p>
+              <div class="item_right">
+                <el-slider v-model="pic_ele.z" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+          </div>
+          <div class="box box4">
+            <p class="box_title">大小</p>
+            <div class="item">
+              <p class="name">宽度</p>
+              <div class="item_right">
+                <el-slider v-model="pic_ele.w" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">高度</p>
+              <div class="item_right">
+                <el-slider v-model="pic_ele.h" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="text_editor editor" v-else-if="editor=='text'">
+          <p class="editor_title">文本</p>
+        </div>
+        <div class="device_editor editor" v-else-if="editor=='device'">
+          <p class="editor_title">设备数据</p>
+        </div>
+        <div class="weather_editor editor" v-else-if="editor=='weather'">
+          <p class="editor_title">室外天气</p>
+        </div>
+        <div class="time_editor editor" v-else>
+          <p class="editor_title">北京时间</p>
+        </div>
+      </div>
     </div>
+
+    <el-dialog :visible.sync="dialogVisible" class="dialog" size="tiny" :before-close="handleCloseDialog">
+      <span slot="title" class="dialog-title">新建配置</span>
+      <span>
+        <el-form :model="newConfigForm" label-width="100px" class="newConfigForm">
+          <el-form-item prop="name" label="配置名称" :rules="[
+                                                                { required: true, message: '配置名称不能为空', trigger: 'blur' }
+                                                              ]">
+            <el-input v-model="newConfigForm.name"></el-input>
+          </el-form-item>
+          <el-form-item prop="model" label="模板选择" label-width="100px">
+            <el-select v-model="newConfigForm.model">
+              <el-option label="自定义" value="new"></el-option>
+              <el-option label="modela" value="modela"></el-option>
+              <el-option label="modelb" value="modelb"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false,newConfigForm.name = '',newConfigForm.model='user'">取 消</el-button>
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -68,9 +206,33 @@ export default {
     model: {
       name: null,
       content: null
+    },
+    configList: [],
+    dialogVisible: false,
+    newConfigForm: {
+      name: '',
+      model: 'new'
+    },
+    editor: 'pic',
+    pic_ele: {
+      img: '',
+      x: 88,
+      y: 10,
+      z: 1,
+      w: 100,
+      h: 100,
+      radius: 22,
+      opacity: 33
     }
   }),
   methods: {
+    test(val) {
+      if (val) {
+        alert(val)
+      } else {
+        alert('test')
+      }
+    },
     logout() {
       return new Promise((resolve, reject) => {
         logout().then(response => {
@@ -81,7 +243,7 @@ export default {
         })
       })
     },
-    addTab(targetName) {
+    addTab(targetName) {  // 点击编辑按钮，tab跳转至右侧指定配置文件元素列表
       console.log(targetName)
       this.model.name = targetName
       this.model.content = targetName
@@ -94,15 +256,27 @@ export default {
         content: null
       }
     },
+    deleteConfig(targetName) {
+      let index = this.configList.indexOf(targetName);
+      this.configList.remove(index)
+    },
     addElement(val) {
-      alert(val)
+      this.editor = val
     },
     save() {
       alert('save')
     },
     play() {
-      alert('play')
-      window.open('http://www.baidu.com')
+      let url = window.location.href
+      let pathname = window.location.pathname
+      let index = url.indexOf(pathname)
+      url = url.substring(0, index) + '/preview'
+      window.open(url)  // jump to preview page
+    },
+    handleCloseDialog(done) {
+      this.newConfigForm.name = ''
+      this.newConfigForm.model = 'new'
+      done()
     },
     noBgColor() {
       alert('no bg color')
@@ -129,6 +303,7 @@ export default {
     this.cityOption = this.hotCities.map(item => {
       return { value: item, label: item };
     })
+    this.configList = ['modela', 'modelb', 'modelc', 'hotel', '工厂', '学校']
   }
 }
 </script>
@@ -145,12 +320,13 @@ export default {
 
 .data-container {
   width: 100%;
-  min-width: 960px;
+  min-width: 1280px;
 }
 
-.title {
+.main_title {
   font-size: 24px;
   width: 100%;
+  min-width: 1280px;
   height: 64px;
   line-height: 64px;
   color: white;
@@ -171,17 +347,16 @@ export default {
 }
 
 .left {
-  background-color: #FFB6C1;
+  //background-color: #FFB6C1;
   width: 200px;
   height: 100%;
   float: left;
   .el-tabs {
-    margin-top: 66px;
-    height: calc(100% - 70px);
+    margin-top: 65px;
+    height: calc(100% - 69px);
 
     .el-tabs__content {
       height: calc(100% - 150px);
-      // background-color: #FFDEAD;
       overflow-y: auto;
     }
 
@@ -193,10 +368,6 @@ export default {
       border-radius: 4px;
       padding: 10px 15px;
       font-size: 22px;
-      svg-icon {
-        width: 1.5em;
-        height: 1.5em;
-      }
     }
     .icon1 {
       float: left;
@@ -211,26 +382,183 @@ export default {
       cursor: pointer;
       color: #20a0ff;
     }
-  } // .el-button {
-  //   width: 80%;
-  //   margin: 10px auto;
-  // }
+  }
+  .el-button {
+    width: 160px;
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+  }
 }
 
 
 
 
 .center {
-  background-color: #00FFFF;
+  //background-color: #00FFFF;
   width: calc(100% - 500px);
   height: 100%;
   float: left;
+  .center_top {
+    width: 98%; //background-color: yellow;
+    margin-top: 64px;
+    margin-left: 1%;
+    padding: 5px 10px;
+    background-color: #eef1f6;
+    .element_buttons {
+      padding: 10px 5px; //background-color: blue;
+      .el-button {
+        width: 100px;
+        margin-left: 0;
+        margin-right: 10px;
+        margin-top: 10px;
+      }
+    }
+    .operate_buttons {
+      padding: 10px 5px;
+      margin-top: 10px; //background-color: red;
+    }
+  }
+
+  .preview_box {
+    width: 98%;
+    height: 0px;
+    overflow: hidden;
+    margin-left: 1%;
+    margin-top: 20px;
+    padding-bottom: 55.125%;
+    border: 1px solid rgb(204, 204, 204);
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .12), 0 0 6px 0 rgba(0, 0, 0, .04);
+  }
 }
 
 .right {
-  background-color: #FFDEAD;
+  background-color: rgba(248, 248, 248, 1);
   width: 300px;
-  height: 100%;
+  height: calc(100% - 65px);
   float: right;
+  margin-top: 65px;
+  .editor_title {
+    font-size: 20px;
+    width: 100%;
+    text-align: center;
+    padding-top: 7px;
+    padding-bottom: 7px; //background-color: #eef1f6;
+    background-color: rgba(204, 204, 204, 1);
+  }
+  .box {
+    width: 100%;
+
+    .box_title {
+      width: 98%;
+      margin: auto;
+      text-align: center;
+      background-color: white;
+      padding: 4px 0;
+      border: 1px solid #ddd;
+    }
+    .item {
+      width: 100%;
+      height: 50px;
+      line-height: 50px;
+      .name {
+        font-weight: bold;
+        float: left;
+        width: 25%;
+        height: 100%;
+        padding-left: 7px;
+      }
+      .item_right {
+        float: left;
+        width: 70%;
+        height: 100%;
+        .el-input-number--small {
+          width: 45px;
+          margin-top: 10px;
+        }
+        .el-slider__runway.show-input {
+          line-height: 50px;
+          width: 70%;
+          margin-left: 0px;
+          margin-top: 25px;
+        }
+        .el-slider__button-wrapper {
+          top: -24px;
+        }
+      }
+    }
+  }
+}
+
+.pic_editor {
+  .box1 {
+    text-align: center;
+    img {
+      width: 90%;
+      margin: 10px 0;
+    }
+    .a-upload {
+      height: 30px;
+      width: 90%;
+      background: white;
+      line-height: 30px;
+      position: relative;
+      cursor: pointer;
+      color: rgba(0, 0, 0, .7);
+      border-radius: 4px; //overflow: hidden;
+      display: inline-block; // *display: inline;
+      // *zoom: 1;
+      margin-top: 10px;
+      text-align: center;
+      font-size: 18px;
+      border: 1px solid #ddd;
+      text-decoration: none;
+    }
+    .a-upload input {
+      position: absolute;
+      height: 30px;
+      line-height: 30px;
+      font-size: 100px;
+      right: 0;
+      top: 0;
+      opacity: 0;
+      cursor: pointer
+    }
+    .a-upload:hover {
+      color: #444;
+      background: #eee;
+      border-color: #ccc;
+      cursor: pointer;
+    }
+  }
+}
+
+
+
+// 修复dialog内文字抖动问题
+.el-dialog {
+  transform: none;
+  left: 0;
+  position: relative;
+  margin: 0 auto;
+}
+
+.dialog {
+  .el-dialog__header {
+    border-bottom: 1px solid #bfcbd9;
+    padding-bottom: 15px;
+  }
+  .el-dialog__footer {
+    border-top: 1px solid #bfcbd9;
+    padding-top: 15px;
+  }
+  .dialog-title {
+    font-size: 34px;
+    font-weight: bold;
+  }
+  .newConfigForm {
+    width: 80%;
+    margin: 20px auto;
+  }
 }
 </style>

@@ -639,7 +639,7 @@ export default {
 
 .data-container {
   width: 100%;
-  min-width: 960px;
+  min-width: 1200px;
 
   .title {
     font-size: 24px;
@@ -749,7 +749,7 @@ export default {
     .box2,
     .box3,
     .box4 {
-      width: 25%;
+      width: 23%;
       height: 168px;
       margin-left: 1%;
       padding-left: 20px;
@@ -892,7 +892,8 @@ export default {
   }
   .body {
     margin-top: 30px;
-    width: 100%;
+    width: 96%;
+    margin: 10px auto;
   }
   .left {
     width: 250px;
