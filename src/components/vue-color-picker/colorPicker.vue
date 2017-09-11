@@ -74,7 +74,7 @@ export default {
     // 默认颜色
     defaultColor: {
       type: String,
-      default: '#000'
+      default: 'red'
     },
     // 禁用状态
     disabled: {
@@ -233,6 +233,7 @@ export default {
     visibility: hidden;
     border-radius: 2px;
     margin-top: 2px;
+    margin-left: -100px;
     padding: 10px;
     padding-bottom: 5px;
     box-shadow: 0 0 5px rgba(0, 0, 0, .15);
@@ -250,7 +251,7 @@ export default {
   .box.open {
     visibility: visible;
     opacity: 1;
-    z-index: 10000;
+    z-index: 9999;
   }
   .hd {
     overflow: hidden;

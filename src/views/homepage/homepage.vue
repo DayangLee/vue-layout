@@ -62,17 +62,17 @@
           </el-col>
         </el-row>
 
-        <div class="preview_box"></div>
+        <div id="preview_box"></div>
       </div>
 
       <div class="right">
         <div class="pic_editor editor" v-if="editor=='pic'">
           <p class="editor_title">图片</p>
           <div class="box box1">
-            <a href="javascript:;" class="a-upload">
-              <input type="file" name="" id="uploadImage">更换图片
+            <a href="javascript:;" class="a-upload" @change="uploadPic">
+              <input type="file" name="" id="uploadImage">上传图片
             </a>
-            <img src="../../assets/editor/img4.jpg">
+            <img :src=" pic_ele.img " alt="(◕ᴥ◕)还没有上传图片哦">
           </div>
           <div class="box box2">
             <p class="box_title">样式</p>
@@ -135,12 +135,466 @@
         </div>
         <div class="text_editor editor" v-else-if="editor=='text'">
           <p class="editor_title">文本</p>
+          <div class="box box1">
+            <el-input type="textarea" :rows="5" placeholder="请在此输入内容" v-model="text_ele.text" style="margin-bottom:10px;">
+            </el-input>
+          </div>
+          <div class="box box2">
+            <p class="box_title">样式</p>
+            <div class="item">
+              <p class="name">背景色</p>
+              <div class="item_right">
+                <span class="nobgColor" @click="noBgColor" style="margin-left:20px;">
+                  <img src="../../assets/editor/forbidden.png" />
+                </span>
+                <colorPicker v-model="text_ele.bgc" style="margin-top:5px;margin-left:15px;"></colorPicker>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">边框颜色</p>
+              <div class="item_right">
+                <span class="nobgColor" @click="noBgColor" style="margin-left:20px;">
+                  <img src="../../assets/editor/forbidden.png" />
+                </span>
+                <colorPicker v-model="text_ele.bc" style="margin-top:5px;margin-left:15px;"></colorPicker>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">圆角</p>
+              <div class="item_right">
+                <el-slider v-model="text_ele.radius" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">透明</p>
+              <div class="item_right">
+                <el-slider v-model="text_ele.opacity" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">边框宽度</p>
+              <div class="item_right">
+                <el-slider v-model="text_ele.bw" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+          </div>
+          <div class="box box3">
+            <p class="box_title">文字显示</p>
+            <div class="item">
+              <p class="name">颜色</p>
+              <div class="item_right">
+                <!-- <span class="nobgColor" @click="noBgColor" style="margin-left:20px;">
+                                                          <img src="../../assets/editor/forbidden.png" />
+                                                        </span> -->
+                <colorPicker v-model="text_ele.color" style="margin-top:5px;margin-left:15px;"></colorPicker>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">大小</p>
+              <div class="item_right">
+                <el-slider v-model="text_ele.size" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">字体</p>
+              <div class="item_right">
+                <el-select v-model="text_ele.font" placeholder="请选择">
+                  <el-option v-for="item in fontFamilyList" :key="item.value" :label="item.label" :value="item.value">
+                  </el-option>
+                </el-select>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">加粗</p>
+              <div class="item_right">
+                <el-select v-model="text_ele.bold" placeholder="请选择">
+                  <el-option v-for="item in boldStyleList" :key="item.value" :label="item.label" :value="item.value">
+                  </el-option>
+                </el-select>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">对齐</p>
+              <div class="item_right">
+                <el-select v-model="text_ele.align" placeholder="请选择">
+                  <el-option v-for="item in textAlignList" :key="item.value" :label="item.label" :value="item.value">
+                  </el-option>
+                </el-select>
+              </div>
+            </div>
+          </div>
+          <div class="box box4">
+            <p class="box_title">位置</p>
+            <div class="item">
+              <p class="name">X轴</p>
+              <div class="item_right">
+                <el-slider v-model="text_ele.x" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">Y轴</p>
+              <div class="item_right">
+                <el-slider v-model="text_ele.y" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">层级</p>
+              <div class="item_right">
+                <el-slider v-model="text_ele.z" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+          </div>
+          <div class="box box5">
+            <p class="box_title">大小</p>
+            <div class="item">
+              <p class="name">宽</p>
+              <div class="item_right">
+                <el-slider v-model="text_ele.w" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">高</p>
+              <div class="item_right">
+                <el-slider v-model="text_ele.h" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="device_editor editor" v-else-if="editor=='device'">
           <p class="editor_title">设备数据</p>
+          <div class="box box1">
+            <div class="box1">
+              <div class="item">
+                <p class="name">设备名称</p>
+                <div class="item_right">
+                  <el-input v-model="dev_ele.name" placeholder="请输入内容"></el-input>
+                </div>
+              </div>
+              <div class="item">
+                <p class="name">设备选择</p>
+                <div class="item_right">
+                  <el-select v-model="city" filterable remote placeholder="请输入关键词" :remote-method="remoteMethod" :loading="loading">
+                    <el-option v-for="item in cityOption" :key="item.value" :label="item.label" :value="item.value">
+                    </el-option>
+                  </el-select>
+                </div>
+              </div>
+              <div class="item">
+                <p class="name">时间格式</p>
+                <div class="item_right">
+                  <el-select v-model="dev_ele.timeFormat" :disabled="dev_ele.dataType==='updateTime'?false:true" placeholder="请选择">
+                    <el-option v-for="item in timeFormatList" :key="item.value" :label="item.label" :value="item.value">
+                    </el-option>
+                  </el-select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="box box2">
+            <p class="box_title">数据类型</p>
+            <el-radio-group v-model="dev_ele.dataType" style="margin-top:10px;width:90%;margin-left:10px;line-height:30px;">
+              <el-radio label="pm2d5">PM2.5</el-radio>
+              <el-radio label="temp">温度</el-radio>
+              <el-radio label="hum">湿度</el-radio>
+              <el-radio label="ch2o">甲醛</el-radio>
+              <el-radio label="co2">CO2</el-radio>
+              <el-radio label="tvoc">TVOC</el-radio>
+              <el-radio label="o3">臭氧</el-radio>
+              <el-radio label="o2">氧气</el-radio>
+              <el-radio label="noise">噪音</el-radio>
+              <el-radio label="pressure">气压</el-radio>
+              <el-radio label="updateTime">更新时间</el-radio>
+              <el-radio label="rank">污染等级</el-radio>
+            </el-radio-group>
+          </div>
+          <div class="box box3">
+            <p class="box_title">样式</p>
+            <div class="item">
+              <p class="name">背景色</p>
+              <div class="item_right">
+                <span class="nobgColor" @click="noBgColor" style="margin-left:20px;">
+                  <img src="../../assets/editor/forbidden.png" />
+                </span>
+                <colorPicker v-model="dev_ele.bgc" style="margin-top:5px;margin-left:15px;"></colorPicker>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">边框颜色</p>
+              <div class="item_right">
+                <span class="nobgColor" @click="noBgColor" style="margin-left:20px;">
+                  <img src="../../assets/editor/forbidden.png" />
+                </span>
+                <colorPicker v-model="dev_ele.bc" style="margin-top:5px;margin-left:15px;"></colorPicker>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">圆角</p>
+              <div class="item_right">
+                <el-slider v-model="dev_ele.radius" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">透明度</p>
+              <div class="item_right">
+                <el-slider v-model="dev_ele.opacity" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">边框宽度</p>
+              <div class="item_right">
+                <el-slider v-model="dev_ele.bw" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+          </div>
+          <div class="box box4">
+            <p class="box_title">文字显示</p>
+            <div class="item">
+              <p class="name">大小</p>
+              <div class="item_right">
+                <el-slider v-model="dev_ele.size" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">字体</p>
+              <div class="item_right">
+                <el-select v-model="dev_ele.font" placeholder="请选择">
+                  <el-option v-for="item in fontFamilyList" :key="item.value" :label="item.label" :value="item.value">
+                  </el-option>
+                </el-select>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">加粗</p>
+              <div class="item_right">
+                <el-select v-model="dev_ele.bold" placeholder="请选择">
+                  <el-option v-for="item in boldStyleList" :key="item.value" :label="item.label" :value="item.value">
+                  </el-option>
+                </el-select>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">对齐</p>
+              <div class="item_right">
+                <el-select v-model="dev_ele.align" placeholder="请选择">
+                  <el-option v-for="item in textAlignList" :key="item.value" :label="item.label" :value="item.value">
+                  </el-option>
+                </el-select>
+              </div>
+            </div>
+          </div>
+          <div class="box box5">
+            <p class="box_title">位置</p>
+            <div class="item">
+              <p class="name">X轴</p>
+              <div class="item_right">
+                <el-slider v-model="dev_ele.x" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">Y轴</p>
+              <div class="item_right">
+                <el-slider v-model="dev_ele.y" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">层级</p>
+              <div class="item_right">
+                <el-slider v-model="dev_ele.z" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+          </div>
+          <div class="box box6">
+            <p class="box_title">大小</p>
+            <div class="item">
+              <p class="name">宽</p>
+              <div class="item_right">
+                <el-slider v-model="dev_ele.w" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">高</p>
+              <div class="item_right">
+                <el-slider v-model="dev_ele.h" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="weather_editor editor" v-else-if="editor=='weather'">
           <p class="editor_title">室外天气</p>
+          <div class="box box1">
+            <div class="item">
+              <p class="name">室外名称</p>
+              <div class="item_right">
+                <el-input v-model="weather_ele.name" placeholder="请输入内容"></el-input>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">城市选择</p>
+              <div class="item_right">
+                <el-select v-model="weather_ele.city" filterable remote placeholder="请输入关键词" :remote-method="remoteMethod" :loading="loading">
+                  <el-option v-for="item in cityOption" :key="item.value" :label="item.label" :value="item.value">
+                  </el-option>
+                </el-select>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">时间格式</p>
+              <div class="item_right">
+                <el-select v-model="weather_ele.timeFormat" :disabled="weather_ele.dataType==='updateTime'?false:true" placeholder="请选择">
+                  <el-option v-for="item in timeFormatList" :key="item.value" :label="item.label" :value="item.value">
+                  </el-option>
+                </el-select>
+              </div>
+            </div>
+          </div>
+          <div class="box box2">
+            <p class="box_title">数据类型</p>
+            <el-radio-group v-model="weather_ele.dataType" style="margin-top:10px;width:90%;margin-left:10px;line-height:30px;">
+              <el-radio label="pm2d5">PM2.5</el-radio>
+              <el-radio label="temp">温度</el-radio>
+              <el-radio label="hum">湿度</el-radio>
+              <el-radio label="updateTime">更新时间</el-radio>
+              <el-radio label="rank">污染等级</el-radio>
+            </el-radio-group>
+          </div>
+          <div class="box box3">
+            <p class="box_title">样式</p>
+            <div class="item">
+              <p class="name">背景色</p>
+              <div class="item_right">
+                <span class="nobgColor" @click="noBgColor" style="margin-left:20px;">
+                  <img src="../../assets/editor/forbidden.png" />
+                </span>
+                <colorPicker v-model="weather_ele.bgc" style="margin-top:5px;margin-left:15px;"></colorPicker>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">边框颜色</p>
+              <div class="item_right">
+                <span class="nobgColor" @click="noBgColor" style="margin-left:20px;">
+                  <img src="../../assets/editor/forbidden.png" />
+                </span>
+                <colorPicker v-model="weather_ele.bc" style="margin-top:5px;margin-left:15px;"></colorPicker>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">圆角</p>
+              <div class="item_right">
+                <el-slider v-model="weather_ele.radius" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">透明度</p>
+              <div class="item_right">
+                <el-slider v-model="weather_ele.opacity" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">边框宽度</p>
+              <div class="item_right">
+                <el-slider v-model="weather_ele.bw" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+          </div>
+          <div class="box box4">
+            <p class="box_title">文字显示</p>
+            <div class="item">
+              <p class="name">大小</p>
+              <div class="item_right">
+                <el-slider v-model="weather_ele.size" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">字体</p>
+              <div class="item_right">
+                <el-select v-model="weather_ele.font" placeholder="请选择">
+                  <el-option v-for="item in fontFamilyList" :key="item.value" :label="item.label" :value="item.value">
+                  </el-option>
+                </el-select>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">加粗</p>
+              <div class="item_right">
+                <el-select v-model="weather_ele.bold" placeholder="请选择">
+                  <el-option v-for="item in boldStyleList" :key="item.value" :label="item.label" :value="item.value">
+                  </el-option>
+                </el-select>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">对齐</p>
+              <div class="item_right">
+                <el-select v-model="weather_ele.align" placeholder="请选择">
+                  <el-option v-for="item in textAlignList" :key="item.value" :label="item.label" :value="item.value">
+                  </el-option>
+                </el-select>
+              </div>
+            </div>
+          </div>
+          <div class="box box5">
+            <p class="box_title">位置</p>
+            <div class="item">
+              <p class="name">X轴</p>
+              <div class="item_right">
+                <el-slider v-model="weather_ele.x" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">Y轴</p>
+              <div class="item_right">
+                <el-slider v-model="weather_ele.y" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">层级</p>
+              <div class="item_right">
+                <el-slider v-model="weather_ele.z" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+          </div>
+          <div class="box box6">
+            <p class="box_title">大小</p>
+            <div class="item">
+              <p class="name">宽</p>
+              <div class="item_right">
+                <el-slider v-model="weather_ele.w" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+            <div class="item">
+              <p class="name">高</p>
+              <div class="item_right">
+                <el-slider v-model="weather_ele.h" show-input :show-input-controls="false">
+                </el-slider>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="time_editor editor" v-else>
           <p class="editor_title">北京时间</p>
@@ -153,8 +607,8 @@
       <span>
         <el-form :model="newConfigForm" label-width="100px" class="newConfigForm">
           <el-form-item prop="name" label="配置名称" :rules="[
-                                                                { required: true, message: '配置名称不能为空', trigger: 'blur' }
-                                                              ]">
+                                                                                                                    { required: true, message: '配置名称不能为空', trigger: 'blur' }
+                                                                                                                  ]">
             <el-input v-model="newConfigForm.name"></el-input>
           </el-form-item>
           <el-form-item prop="model" label="模板选择" label-width="100px">
@@ -175,12 +629,14 @@
 </template>
 
 <script>
+import $ from 'jquery'
 import { logout } from '@/api/login'
 import colorPicker from '@/components/vue-color-picker/colorPicker'
 const cityList = ['北京', '上海', '广州', '深圳', '南京']
-const fontFamilyList = [{ value: '宋体', label: '宋体' }, { value: '楷体', label: '楷体' }, { value: '黑体', label: '黑体' }]
-const boldStyleList = [{ value: 'false', label: '不加粗' }, { value: '200', label: '200' }, { value: '300', label: '300' }, { value: '400', label: '400' }, { value: '500', label: '500' }, { value: '600', label: '600' }, { value: '700', label: '700' }, { value: '800', label: '800' }, { value: '900', label: '900' }]
-const textAlignList = [{ value: 'left', label: '左对齐' }, { value: 'right', label: '右对齐' }, { value: 'center', label: '居中' }]
+const fontFamilyList = [{ value: '1', label: '宋体' }, { value: '2', label: '楷体' }, { value: '3', label: '黑体' }]
+const boldStyleList = [{ value: false, label: '不加粗' }, { value: 200, label: '200' }, { value: 300, label: '300' }, { value: 400, label: '400' }, { value: 500, label: '500' }, { value: 600, label: '600' }, { value: 700, label: '700' }, { value: 800, label: '800' }, { value: 900, label: '900' }]
+const textAlignList = [{ value: 1, label: '左对齐' }, { value: 2, label: '右对齐' }, { value: 3, label: '居中' }]
+const timeFormatList = [{ value: 'yyyy年MM月dd日HH时mm分', label: 'yyyy年MM月dd日HH时mm分' }, { value: 'MM月dd日HH时mm分', label: 'MM月dd日HH时mm分' }, { value: 'yyyy/MM/dd HH:mm', label: 'yyyy/MM/dd HH:mm' }]
 export default {
   components: { colorPicker },
   data: () => ({
@@ -202,7 +658,9 @@ export default {
     fontFamilyList: fontFamilyList,
     boldStyleList: boldStyleList,
     textAlignList: textAlignList,
+    timeFormatList: timeFormatList,
     textarea: '',
+    dev_timeFormat: true,
     model: {
       name: null,
       content: null
@@ -223,6 +681,68 @@ export default {
       h: 100,
       radius: 22,
       opacity: 33
+    },
+    text_ele: {
+      x: 88,
+      y: 10,
+      z: 1,
+      w: 100,
+      h: 100,
+      bc: 'white',
+      bw: null,
+      bgc: 'white',
+      text: '',
+      size: 25,
+      color: 'black',
+      font: '宋体',
+      align: 1,
+      bold: 400,
+      radius: 22,
+      opacity: 33
+    },
+    dev_ele: {
+      name: null,
+      x: 100,
+      y: 200,
+      w: 50,
+      h: 50,
+      z: 99,
+      bgc: 'white',
+      radius: 0,
+      opacity: 100,
+      bc: 'white',
+      bw: 0,
+      text: "{value}",
+      size: 13,
+      color: "black",
+      font: "宋体",
+      align: 1,
+      bold: 400,
+      dataType: "pm2d5",
+      timeFormat: "yyyy年MM月dd日HH点mm分",
+      frames: null
+    },
+    weather_ele: {
+      name: null,
+      x: 35,
+      y: 51,
+      w: 14,
+      h: 7,
+      z: 30,
+      bgc: 'white',
+      radius: 0,
+      opacity: 100,
+      bc: 'white',
+      bw: 0,
+      text: "",
+      size: 5,
+      color: 'black',
+      font: "楷体",
+      align: 2,
+      bold: 600,
+      city: "",
+      dataType: "pm2d5",
+      timeFormat: "yyyy年MM月dd日HH点mm分"
     }
   }),
   methods: {
@@ -280,6 +800,50 @@ export default {
     },
     noBgColor() {
       alert('no bg color')
+    },
+    uploadPic(e) {
+      console.log(e)
+      //console.log(this)
+      // $(".a-upload").on("change", "input[type='file']", function(e) {
+      var filePath = e.path[0].value;
+      //console.log(filePath);
+      this.pic_ele.img = filePath
+      //$('.pic_editor .box1 img').attr('src', filePath);
+      var file = e.target.files[0]; //获取图片资源
+
+      // 只选择图片文件
+      if (!file.type.match('image.*')) {
+        return false;
+      }
+
+      var reader = new FileReader();
+
+      reader.readAsDataURL(file); // 读取文件
+      //console.log(file);
+      // 渲染文件
+      reader.onload = function(arg) {
+        //console.log(file);
+        console.log(arg)
+        var img = '<img class=' + file.name + ' src="' + arg.target.result + '" alt="preview"/>';
+        // if (file.name.indexOf('.') == -1) {
+        //   var img = '<img class=' + file.name + ' src="' + arg.target.result + '" alt="preview"/>';
+        //   this.pic_ele.img = arg.target.result
+        // } else {
+        //   var img = '<img class=' + file.name.substring(0, file.name.indexOf('.')) + ' src="' + arg.target.result + '" alt="preview"/>';
+        // }
+
+        document.getElementById('preview_box').append(img)
+        //$(".preview_box").empty().append(img);
+        //$('.preview').empty().append(img);
+      }
+
+      // if (file.name.indexOf('.') == -1) {
+      //   setCookie('image', file.name, 1);
+      // } else {
+      //   setCookie('image', file.name.substring(0, file.name.indexOf('.')), 1);
+      // }
+
+      // })
     },
     remoteMethod(query) {
       if (query !== '') {
@@ -420,7 +984,7 @@ export default {
     }
   }
 
-  .preview_box {
+  #preview_box {
     width: 98%;
     height: 0px;
     overflow: hidden;
@@ -438,6 +1002,7 @@ export default {
   height: calc(100% - 65px);
   float: right;
   margin-top: 65px;
+  overflow-y: auto;
   .editor_title {
     font-size: 20px;
     width: 100%;
@@ -487,6 +1052,10 @@ export default {
         }
       }
     }
+    .el-radio {
+      margin-left: 0;
+      margin-right: 8px;
+    }
   }
 }
 
@@ -505,7 +1074,8 @@ export default {
       position: relative;
       cursor: pointer;
       color: rgba(0, 0, 0, .7);
-      border-radius: 4px; //overflow: hidden;
+      border-radius: 4px;
+      overflow: hidden;
       display: inline-block; // *display: inline;
       // *zoom: 1;
       margin-top: 10px;
