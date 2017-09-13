@@ -62,7 +62,9 @@
           </el-col>
         </el-row>
 
-        <div id="preview_box"></div>
+        <div id="preview_box">
+          <div class="test">test</div>
+        </div>
       </div>
 
       <div class="right">
@@ -187,8 +189,8 @@
               <p class="name">颜色</p>
               <div class="item_right">
                 <!-- <span class="nobgColor" @click="noBgColor" style="margin-left:20px;">
-                                                          <img src="../../assets/editor/forbidden.png" />
-                                                        </span> -->
+                                                                  <img src="../../assets/editor/forbidden.png" />
+                                                                </span> -->
                 <colorPicker v-model="text_ele.color" style="margin-top:5px;margin-left:15px;"></colorPicker>
               </div>
             </div>
@@ -607,8 +609,8 @@
       <span>
         <el-form :model="newConfigForm" label-width="100px" class="newConfigForm">
           <el-form-item prop="name" label="配置名称" :rules="[
-                                                                                                                    { required: true, message: '配置名称不能为空', trigger: 'blur' }
-                                                                                                                  ]">
+                                                                                                                            { required: true, message: '配置名称不能为空', trigger: 'blur' }
+                                                                                                                          ]">
             <el-input v-model="newConfigForm.name"></el-input>
           </el-form-item>
           <el-form-item prop="model" label="模板选择" label-width="100px">
@@ -637,6 +639,8 @@ const fontFamilyList = [{ value: '1', label: '宋体' }, { value: '2', label: '�
 const boldStyleList = [{ value: false, label: '不加粗' }, { value: 200, label: '200' }, { value: 300, label: '300' }, { value: 400, label: '400' }, { value: 500, label: '500' }, { value: 600, label: '600' }, { value: 700, label: '700' }, { value: 800, label: '800' }, { value: 900, label: '900' }]
 const textAlignList = [{ value: 1, label: '左对齐' }, { value: 2, label: '右对齐' }, { value: 3, label: '居中' }]
 const timeFormatList = [{ value: 'yyyy年MM月dd日HH时mm分', label: 'yyyy年MM月dd日HH时mm分' }, { value: 'MM月dd日HH时mm分', label: 'MM月dd日HH时mm分' }, { value: 'yyyy/MM/dd HH:mm', label: 'yyyy/MM/dd HH:mm' }]
+
+
 export default {
   components: { colorPicker },
   data: () => ({
@@ -821,10 +825,23 @@ export default {
       reader.readAsDataURL(file); // 读取文件
       //console.log(file);
       // 渲染文件
-      reader.onload = function(arg) {
+      reader.onload = (arg) => {
         //console.log(file);
         console.log(arg)
+        var doc = $(document.getElementById('preview_box'))
+        console.log(doc)
+        console.log(doc[0].children)
+        //doc[0].children.push({})
         var img = '<img class=' + file.name + ' src="' + arg.target.result + '" alt="preview"/>';
+        doc[0].children.push(img)
+        // this.node.children.push({
+        //   name: val,
+        //   children: []
+        // });
+        // var img = Vue.extend({
+        //   template: '<img class=' + file.name + ' src="' + arg.target.result + '" alt="preview"/>'
+        // })
+       
         // if (file.name.indexOf('.') == -1) {
         //   var img = '<img class=' + file.name + ' src="' + arg.target.result + '" alt="preview"/>';
         //   this.pic_ele.img = arg.target.result
@@ -832,7 +849,7 @@ export default {
         //   var img = '<img class=' + file.name.substring(0, file.name.indexOf('.')) + ' src="' + arg.target.result + '" alt="preview"/>';
         // }
 
-        document.getElementById('preview_box').append(img)
+        //document.getElementById('preview_box').append(img)
         //$(".preview_box").empty().append(img);
         //$('.preview').empty().append(img);
       }
