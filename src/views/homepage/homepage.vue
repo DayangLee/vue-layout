@@ -63,7 +63,7 @@
         </el-row>
 
         <div id="preview_box">
-          <div class="test">test</div>
+          <!-- <div class="test">test</div> -->
         </div>
       </div>
 
@@ -72,7 +72,7 @@
           <p class="editor_title">图片</p>
           <div class="box box1">
             <a href="javascript:;" class="a-upload" @change="uploadPic">
-              <input type="file" name="" id="uploadImage">上传图片
+              <input type="file" name="file" id="uploadImage">上传图片
             </a>
             <img :src=" pic_ele.img " alt="(◕ᴥ◕)还没有上传图片哦">
           </div>
@@ -807,6 +807,7 @@ export default {
     },
     uploadPic(e) {
       console.log(e)
+      e.preventDefault()
       //console.log(this)
       // $(".a-upload").on("change", "input[type='file']", function(e) {
       var filePath = e.path[0].value;
@@ -830,11 +831,12 @@ export default {
         console.log(arg)
         var doc = $(document.getElementById('preview_box'))
         console.log(doc)
-        console.log(doc[0].children)
+        //console.log(doc[0].children)
         //doc[0].children.push({})
-        var img = '<img class=' + file.name + ' src="' + arg.target.result + '" alt="preview"/>';
-        doc[0].children.push(img)
-        // this.node.children.push({
+        var img = '<img class=' + file.name + ' src="' + arg.target.result + '" alt="preview"/>'
+        //console.log(img)
+        //doc[0].children.push(img)
+        // this.node.children.push({ 
         //   name: val,
         //   children: []
         // });
@@ -850,7 +852,7 @@ export default {
         // }
 
         //document.getElementById('preview_box').append(img)
-        //$(".preview_box").empty().append(img);
+        $(".preview_box").empty().append(img);
         //$('.preview').empty().append(img);
       }
 
